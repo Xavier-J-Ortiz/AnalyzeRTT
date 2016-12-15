@@ -26,4 +26,8 @@ def unpack_files():
 
     print actual_content
 
+    new_test_file = open('test.txt', 'w')
+    new_test_file.write(actual_content)
+    new_test_file.close()
+
 unpack_files()
