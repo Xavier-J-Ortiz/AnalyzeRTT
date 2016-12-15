@@ -1,9 +1,15 @@
-import gzip
+import gzip, os
 
-def unpackFiles():
+def unpack_files():
+    file_path = "/home/xortiz/cedexis/S3LogsTest/12"
+    actual_content = ""
+    for file in os.listdir(file_path):
+        unzipped_file = ""
+        if file.endswith(".gz"):
+            full_file_path = file_path + "/" + file
+            unzipped_file = gzip.open(full_file_path, 'rb')
+            actual_content += unzipped_file.read()
 
-    unzippedFile = gzip.open('/home/xortiz/cedexis/S3LogsTest/12/1-14290-openmix-json-2016-12-12T12-33-00Z-m1-w9-c0.gz', 'rb')
-    actualContent = unzippedFile.read()
-    print actualContent
+    print actual_content
 
-unpackFiles()
+unpack_files()
