@@ -61,5 +61,9 @@ def json_create_python_dict(json_concatenated_object):
 # print str(test_answer[0]['reason_code']) + "\n"
 # print str(test_answer[1]['ttl']) + "\n"
 
-### should do a quick sanity test for timestamp order too
-# TBD
+### sanity test for timestamp order too
+# test_answer = json_create_python_dict(unpack_files())
+# new_test_file = open('test_timestamp_order.txt', 'w')
+# for json_test_object in test_answer:
+#     new_test_file.write(json_test_object['timestamp'] + "\n")
+# new_test_file.close()
