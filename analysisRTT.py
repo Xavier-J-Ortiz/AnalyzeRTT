@@ -43,4 +43,6 @@ def unpack_files():
     # new_test_file.write(actual_content)
     # new_test_file.close()
 
+    return actual_content
+
 unpack_files()
