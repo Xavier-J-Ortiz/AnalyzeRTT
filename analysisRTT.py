@@ -1,7 +1,9 @@
 '''
-Parse S3 logs loaded on the local file system. Do some math.
-Analyze results.
+Parse S3 logs downloaded on the local file system. Then do some math
+and analyze results.
 Currently a moving target by Xavier-J-Ortiz
+Debating whether to later load logs directly from S3 bucket, but first want to
+correctly load, parse, and analysis data down.
 '''
 import gzip, os
 
@@ -10,7 +12,7 @@ import gzip, os
 def unpack_files():
     '''
     unpack_files - grabs a file_path, looks at all files ending in .gz
-    opens them up, prints out content.
+    opens them up, prints out content, saves in test.txt.
     '''
     file_path = "/home/xortiz/cedexis/S3LogsTest/12"
     actual_content = ""
@@ -26,8 +28,8 @@ def unpack_files():
 
     print actual_content
 
-    new_test_file = open('test.txt', 'w')
-    new_test_file.write(actual_content)
-    new_test_file.close()
+    # new_test_file = open('test.txt', 'w')
+    # new_test_file.write(actual_content)
+    # new_test_file.close()
 
 unpack_files()
