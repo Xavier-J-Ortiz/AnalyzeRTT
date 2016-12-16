@@ -33,9 +33,57 @@ def unpack_files():
                 full_file_path = root + "/" + file
                 unzipped_file = gzip.open(full_file_path, 'rb')
                 actual_content += unzipped_file.read()
-    print 'tick'are
+    print 'tick'
     return actual_content.split('\n')
 
+def my_splitter(sentence, head, tail):
+    '''
+    splits strings with a distinct beginning and end.
+    :param sentence: string to split
+    :param head: beginning of string to split
+    :param tail: end of string to split
+    :return:
+    '''
+
+    end_of_head = sentence.index(head) + len(head)
+    start_of_tail = sentence.index(tail, end_of_head)
+    return sentence[end_of_head:start_of_tail]
+
+def create_data_points(json_concatenated_object):
+    '''
+    extract fastly and akamai data points
+    :param json_concatenated_object: output of unpack_files()
+    :return: returns a timestamp sorted list of dictionaries from the resulting json input logs
+    '''
+
+    parsed_list = []
+
+    print 'tock'
+
+    for json_object in json_concatenated_object:
+        if (json_object != ""):
+            timestamp = my_splitter(json_object, '"timestamp":"', '"')
+            context = my_splitter(json_object, '"context":', ',"used_edns"')
+            if (context != '{"none":true}'):
+                unparsed_akamai = my_splitter(context, '"akamai_ssl":', ',"fastly_ssl":')
+                akamai_rtt = my_splitter(unparsed_akamai, '"http_rtt":', '}')
+
+                unparsed_fastly = my_splitter(context, ',"fastly_ssl":', '}}') + '}'
+                fastly_rtt = my_splitter(unparsed_fastly, '"http_rtt":', '}')
+
+                list = [timestamp, akamai_rtt, fastly_rtt]
+            # list = [timestamp, context]
+            parsed_list.append(list)
+
+            #python_object = json.loads(json_object)
+            #parsed_list.append(python_object)
+    #sorted function done during the return.
+    print 'schlock'
+    return parsed_list
+
+answer = create_data_points(unpack_files())
+print answer[500]
+print len(answer)
 
 def json_create_python_dict(json_concatenated_object):
     '''
