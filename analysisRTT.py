@@ -50,6 +50,23 @@ def json_create_python_dict(json_concatenated_object):
     #sorted function done during the return.
     return sorted(parsed_list, key=lambda k: k['timestamp'])
 
+def create_x_axis(dict_translation):
+    '''
+    will output a list of x axis points that can be nicely read on a graph
+    :param dict_translation: output of json_create_python_dict, in other words
+    a python dictionary translation of a JSON object
+    :return: a list containing only 'X' axis values parsed accordingly to be plopped into pyplot
+    '''
+
+    x_axis_list = []
+
+    for entry in dict_translation:
+        print entry['timestamp']
+        x_axis_list.append(entry['timestamp'])
+
+    return x_axis_list
+
+
 ### save actual_content to test.txt
 ### useful to verify unpack_files with a finetooth comb
 ### aka: favorite text editor
@@ -69,3 +86,7 @@ def json_create_python_dict(json_concatenated_object):
 # for json_test_object in test_answer:
 #     new_test_file.write(json_test_object['timestamp'] + "\n")
 # new_test_file.close()
+
+### sanity test for create_x_axis output
+
+#test_x_axis = create_x_axis(json_create_python_dict(unpack_files()))
