@@ -6,7 +6,7 @@ Debating whether to later load logs directly from S3 bucket, but first want to
 correctly load, parse, and analysis data down.
 '''
 import gzip, os
-import simplejson as json
+import ujson as json
 
 # functions
 
@@ -33,6 +33,7 @@ def unpack_files():
                 full_file_path = root + "/" + file
                 unzipped_file = gzip.open(full_file_path, 'rb')
                 actual_content += unzipped_file.read()
+    print 'tick'are
     return actual_content.split('\n')
 
 
@@ -93,7 +94,6 @@ def x_segment_by_hour(x_timestamp):
     # create empty dict
     for hour in possible_hours:
         answer[hour] = []
-    print 'tick'
     for entry in x_timestamp:
         current_hour = str(entry).split('T')[1].split(':')[0]
         # print current_hour
@@ -131,8 +131,8 @@ def x_segment_by_hour(x_timestamp):
 
 ###sanity test for parsing out x axis hourly data.
 
-hourly_x_axis_dict = x_segment_by_hour(create_x_axis(json_create_python_dict(unpack_files())))
+#hourly_x_axis_dict = x_segment_by_hour(create_x_axis(json_create_python_dict(unpack_files())))
 
-print hourly_x_axis_dict['00'][0]
-print hourly_x_axis_dict['22'][0]
-print hourly_x_axis_dict['03']
+#print hourly_x_axis_dict['00'][0]
+#print hourly_x_axis_dict['22'][0]
+#print hourly_x_axis_dict['03']
