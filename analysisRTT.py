@@ -5,7 +5,8 @@ Currently a moving target by Xavier-J-Ortiz
 Debating whether to later load logs directly from S3 bucket, but first want to
 correctly load, parse, and analysis data down.
 '''
-import gzip, os, json
+import gzip, os
+import simplejson as json
 
 # functions
 
@@ -14,7 +15,7 @@ def unpack_files():
     unpack_files - grabs a file_path, looks at all files ending in .gz
     opens them up, prints out content, saves in test.txt.
     '''
-    file_path = "/home/xortiz/cedexis/S3LogsTest"
+    file_path = "/home/xortiz/cedexis/S3LogsTest/01"
     actual_content = ""
 
     for root, dirs, files in os.walk(file_path):
@@ -43,11 +44,14 @@ def json_create_python_dict(json_concatenated_object):
 
     parsed_list = []
 
+    print 'tock'
+
     for json_object in json_concatenated_object:
         if (json_object != ""):
             python_object = json.loads(json_object)
             parsed_list.append(python_object)
     #sorted function done during the return.
+    print 'schlock'
     return sorted(parsed_list, key=lambda k: k['timestamp'])
 
 def create_x_axis(dict_translation):
@@ -59,12 +63,46 @@ def create_x_axis(dict_translation):
     '''
 
     x_axis_list = []
-
+    print 'bloc'
     for entry in dict_translation:
-        print entry['timestamp']
         x_axis_list.append(entry['timestamp'])
 
     return x_axis_list
+
+def x_segment_by_hour(x_timestamp):
+    '''
+    will return a list of lists of timestamps in 1 hour chunks, which can be mapped to the
+    python dictionary and help with averaging the fastly and akamai RTT data
+    :param x_timestamp: dictionary of sorted time stamps to be evaluated. This input represents the data collected in a day
+
+    :return:
+    '''
+
+    #create the possible hours in the day to parse in strings
+    possible_hours = []
+    for hour in range(0, 24):
+        if (hour < 10):
+            possible_hours.append('0' + str(hour))
+        else:
+            possible_hours.append(str(hour))
+
+    #print possible_hours
+
+    segmented_timestamps = []
+    answer = {}
+    # create empty dict
+    for hour in possible_hours:
+        answer[hour] = []
+    print 'tick'
+    for entry in x_timestamp:
+        current_hour = str(entry).split('T')[1].split(':')[0]
+        # print current_hour
+        for hour in possible_hours:
+            if current_hour == hour:
+                answer[hour].append(entry)
+
+    return answer
+
 
 
 ### save actual_content to test.txt
@@ -89,4 +127,12 @@ def create_x_axis(dict_translation):
 
 ### sanity test for create_x_axis output
 
-#test_x_axis = create_x_axis(json_create_python_dict(unpack_files()))
+# test_x_axis = create_x_axis(json_create_python_dict(unpack_files()))
+
+###sanity test for parsing out x axis hourly data.
+
+hourly_x_axis_dict = x_segment_by_hour(create_x_axis(json_create_python_dict(unpack_files())))
+
+print hourly_x_axis_dict['00'][0]
+print hourly_x_axis_dict['22'][0]
+print hourly_x_axis_dict['03']
