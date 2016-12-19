@@ -15,6 +15,8 @@ import cPickle as pickle
 # code is stuck due to my oversight, or just taking forever to churn.
 import time
 
+import datetime
+
 
 def unpack_files(filepath_to_walk):
     '''
@@ -69,14 +71,14 @@ def create_data_points(json_concatenated_object):
 
     for json_object in json_concatenated_object:
         if (json_object != ""):
-            timestamp = my_splitter(json_object, '"timestamp":"', '"')
+            timestamp = datetime.datetime.strptime(my_splitter(json_object, '"timestamp":"', '"'), '%Y-%m-%dT%H:%M:%SZ')
             context = my_splitter(json_object, '"context":', ',"used_edns"')
             if (context != '{"none":true}'):
                 unparsed_akamai = my_splitter(context, '"akamai_ssl":', ',"fastly_ssl":')
-                akamai_rtt = my_splitter(unparsed_akamai, '"http_rtt":', '}')
+                akamai_rtt = int(my_splitter(unparsed_akamai, '"http_rtt":', '}'))
 
                 unparsed_fastly = my_splitter(context, ',"fastly_ssl":', '}}') + '}'
-                fastly_rtt = my_splitter(unparsed_fastly, '"http_rtt":', '}')
+                fastly_rtt = int(my_splitter(unparsed_fastly, '"http_rtt":', '}'))
 
                 list = [timestamp, akamai_rtt, fastly_rtt]
             # list = [timestamp, context]
