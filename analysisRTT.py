@@ -5,7 +5,8 @@ Currently a moving target by Xavier-J-Ortiz
 Debating whether to later load logs directly from S3 bucket, but first want to
 correctly load, parse, and analysis data found locally.
 '''
-import gzip, os, pickle
+import gzip, os
+import cPickle as pickle
 # import time
 
 # functions
@@ -104,3 +105,11 @@ def time_to_gather_and_pickle_data(the_file_path, pickle_name):
     print "\nPSA: your data has been pickled for usage with the filename specified in the param pickle_name.\n" +\
           "If a file as the same name as the param pickle_name file exists, it will be overwritten when this\n" +\
           "function is run, so be sure to rename this file if you do not want its data lost."
+
+def open_and_consume_pickled_data(pickle_name):
+    '''
+    creates the original object that was pickled. in this case, just the list containing important JSON information.
+    :param pickle_name: name of the pickle file.
+    :return: list with data points ready for analysis [timestamp, akamai_rtt, fastly_rtt]
+    '''
+    return pickle.load(open(pickle_name, 'rb'))

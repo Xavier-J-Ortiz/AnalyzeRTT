@@ -1,4 +1,4 @@
-import analysisRTT, os
+import analysisRTT, os, time
 file_path = "/home/xortiz/cedexis/S3LogsTest/01"
 pickle_name = "pickled_data.pckl"
 if (os.path.isfile(pickle_name) == False):
@@ -13,3 +13,7 @@ else:
     else:
         print "\nPlease re-run and input a valid answer when prompted with a 'y' or a 'n'"
 
+
+start_time = time.time()
+answer = analysisRTT.open_and_consume_pickled_data(pickle_name)
+print "load time to unpickle and have data ready: " + str(time.time() - start_time)
