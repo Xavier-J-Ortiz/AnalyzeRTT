@@ -4,3 +4,4 @@ test.txt
 test_timestamp_order.txt
 test.txt.tar.gz
 test_timestamp_order.txt.tar.gz
+pickled_data.pckl

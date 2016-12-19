@@ -5,13 +5,15 @@ Currently a moving target by Xavier-J-Ortiz
 Debating whether to later load logs directly from S3 bucket, but first want to
 correctly load, parse, and analysis data found locally.
 '''
-import gzip, os
+import gzip, os, pickle
 # import time
 
 # functions
 
 # tick tock and shlock are commented out and can be uncommented/printed in order to see if / where
 # code is stuck due to my oversight, or just taking forever to churn.
+import time
+
 
 def unpack_files(filepath_to_walk):
     '''
@@ -81,3 +83,24 @@ def create_data_points(json_concatenated_object):
     # print 'schlock'
     # decided to sort on return. Done below
     return sorted(parsed_list, key = lambda x : x[0])
+
+def time_to_gather_and_pickle_data(the_file_path, pickle_name):
+    '''
+    :param the_file_path: path where the data to be harvested is located (string)
+    :param pickle_name: name to pickle file to (string)
+    :return:
+    '''
+    print "Some useful info: "
+    start_time = time.time()
+    answer = create_data_points(unpack_files(the_file_path))
+    print "\ntime to execute data point creation: " + str(time.time() - start_time)
+    print "length of output: " + str(len(answer))
+    print "first item output: " + str(answer[0][0]) + "\nlast item timestamp: " + str(answer[-1][0]) + "\n"
+
+    start_time = time.time()
+    pickle.dump(answer, open(pickle_name, 'wb'))
+    print "\ntime to execute creation of " + pickle_name + ": " + str(time.time() - start_time)
+
+    print "\nPSA: your data has been pickled for usage with the filename specified in the param pickle_name.\n" +\
+          "If a file as the same name as the param pickle_name file exists, it will be overwritten when this\n" +\
+          "function is run, so be sure to rename this file if you do not want its data lost."
