@@ -45,9 +45,9 @@ def check_and_create_data(filepath, pickle_name):
 
 ### Test to check 'check_and_create_data' is working correctly.
 file_path = "/home/xortiz/cedexis/S3LogsTest/01"
-pickle_name = "pickled_data_3_hours.pckl"
+pickle_name = "pickled_data_2_hours.pckl"
 
-#check_and_create_data(file_path, pickle_name)
+# check_and_create_data(file_path, pickle_name)
 
 ### Test load time of pickled file,
 start_time = time.time()
@@ -58,17 +58,29 @@ print answer[500]
 x = []
 y = []
 
-# x_value = 0
+current_timestamp = answer[0][0]
+next_timestamp = current_timestamp + datetime.timedelta(minutes = 15)
+y_points_in_time = []
+counter = 0
+start_time = time.time()
 for datapoint in answer:
-    x.append(datapoint[0])
-    # y = akamai_rtt - fastly_rtt
-    y.append(float(datapoint[1]) - float(datapoint[2]))
-    # x_value += 1
+    # evaluate if curr timestamp is larger than last timestamp in dataset
+    if (datapoint[0] < next_timestamp):
+        # line below represents --> y = akamai_rtt - fastly_rtt
+        y_points_in_time.append(datapoint[1] - datapoint[2])
+    else:
+        avrg_time_chunks_of_y = (sum(y_points_in_time)/len(y_points_in_time))
+        y.append(avrg_time_chunks_of_y)
+        x.append(current_timestamp)
+        current_timestamp = current_timestamp + datetime.timedelta(minutes = 15)
+        next_timestamp = current_timestamp + datetime.timedelta(minutes = 15)
 
+    avrg_time_chunks_of_y = (sum(y_points_in_time)/len(y_points_in_time))
+    y.append(avrg_time_chunks_of_y)
+    x.append(current_timestamp)
 
+print "load time for diff datapoints: " + str(time.time() - start_time)
 print len(x)
-print x[500]
 
 plt.plot(x, y, 'ro')
 plt.show()
-
