@@ -7,16 +7,8 @@ correctly load, parse, and analysis data found locally.
 '''
 import gzip, os
 import cPickle as pickle
-# import time
-
-# functions
-
-# tick tock and shlock are commented out and can be uncommented/printed in order to see if / where
-# code is stuck due to my oversight, or just taking forever to churn.
 import time
-
 import datetime
-
 
 def unpack_files(filepath_to_walk):
     '''
@@ -26,23 +18,14 @@ def unpack_files(filepath_to_walk):
     :return: list of extracted json objects. one per list #.
     '''
     actual_content = ""
-
+    # walk the down the filepath, open and save .gz data, return split data
     for root, dirs, files in os.walk(filepath_to_walk):
-
-        ### added these lines below just to see what was being housed in root/dirs/files
-        ### and see what was going on. Might take this out in a later version
-        # print "This is the root: " + root
-        # print "This is the dirs : " + str(dirs)
-        # print "This is the files : " + str(files)
-        ###
-
         for file in files:
-            unzipped_file = ""
             if file.endswith(".gz"):
                 full_file_path = root + "/" + file
                 unzipped_file = gzip.open(full_file_path, 'rb')
                 actual_content += unzipped_file.read()
-    # print 'tick'
+    # returns a list with each JSON entry as the element - OPTIMIZE?
     return actual_content.split('\n')
 
 def my_splitter(sentence, head, tail):
@@ -64,49 +47,52 @@ def create_data_points(json_concatenated_object):
     :param json_concatenated_object: output of unpack_files()
     :return: returns a timestamp sorted list of lists from the resulting json input logs, i.e: [[timestamp, akamai_rtt, fastly_rtt]]
     '''
-
     parsed_list = []
-
-    # print 'tock'
-
     for json_object in json_concatenated_object:
+        # there were blank json entries. So.... If not blank, parse.
         if (json_object != ""):
+            # timestamp is a datetime object that is created from a string containing a timestamp from the JSON.
+            # datetime object is very useful in the creation of the actual final data prior to plot as the object
+            # allows easy time comparison, addition, and presentation in pyplot (for plotting) - OPTIMIZE?
             timestamp = datetime.datetime.strptime(my_splitter(json_object, '"timestamp":"', '"'), '%Y-%m-%dT%H:%M:%SZ')
             context = my_splitter(json_object, '"context":', ',"used_edns"')
+            # there were context entries that did not have detailed information about the CDNs. So...
+            # if there is detailed information in the context (aka: NOT '{"none":true}'), parse.
             if (context != '{"none":true}'):
+                # opted to not use one-liners for readability.
+                # akamai_rtt
                 unparsed_akamai = my_splitter(context, '"akamai_ssl":', ',"fastly_ssl":')
                 akamai_rtt = int(my_splitter(unparsed_akamai, '"http_rtt":', '}'))
-
+                # fastly_rtt
                 unparsed_fastly = my_splitter(context, ',"fastly_ssl":', '}}') + '}'
                 fastly_rtt = int(my_splitter(unparsed_fastly, '"http_rtt":', '}'))
-
+                # actual datapoint with RTT taken at that particular moment in time.
                 list = [timestamp, akamai_rtt, fastly_rtt]
-            # list = [timestamp, context]
+            # List of all the timestamped datapoints.
             parsed_list.append(list)
-    # print 'schlock'
-    # decided to sort on return. Done below
+    # returned a sorted list of the datapoints from events that happened first, to the events that happened last
     return sorted(parsed_list, key = lambda x : x[0])
 
 def time_to_gather_and_pickle_data(the_file_path, pickle_name):
     '''
+    creates data from the .gz files from the pointed the_file_path and pickles the data
     :param the_file_path: path where the data to be harvested is located (string)
     :param pickle_name: name to pickle file to (string)
-    :return:
+    :return: returns data points that were pickled.
     '''
+    # unpack .gz file, record, and create the initial JSON-decoded data structure
     print "Some useful info: "
     start_time = time.time()
     answer = create_data_points(unpack_files(the_file_path))
     print "\ntime to execute data point creation: " + str(time.time() - start_time)
     print "length of output: " + str(len(answer))
     print "first item output: " + str(answer[0][0]) + "\nlast item timestamp: " + str(answer[-1][0]) + "\n"
-
+    # create pickle file for later consumption. That is, no need to harvest and parse large dataset.
     start_time = time.time()
     pickle.dump(answer, open(pickle_name, 'wb'))
     print "\ntime to execute creation of " + pickle_name + ": " + str(time.time() - start_time)
-
-    print "\nPSA: your data has been pickled for usage with the filename specified in the param pickle_name.\n" +\
-          "If a file as the same name as the param pickle_name file exists, it will be overwritten when this\n" +\
-          "function is run, so be sure to rename this file if you do not want its data lost."
+    # good idea to create pickled data, and also return the answer.
+    return answer
 
 def open_and_consume_pickled_data(pickle_name):
     '''
@@ -114,4 +100,8 @@ def open_and_consume_pickled_data(pickle_name):
     :param pickle_name: name of the pickle file.
     :return: list with data points ready for analysis [timestamp, akamai_rtt, fastly_rtt]
     '''
-    return pickle.load(open(pickle_name, 'rb'))
+    # pretty straight forward. Load a pickled file with some useful time performance data tagged.
+    start_time_unpickle = time.time()
+    answer = pickle.load(open(pickle_name, 'rb'))
+    print "load time to unpickle and have data ready: " + str(time.time() - start_time_unpickle)
+    return answer
