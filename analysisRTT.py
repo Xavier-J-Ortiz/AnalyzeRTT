@@ -25,7 +25,10 @@ def unpack_files(filepath_to_walk):
                 full_file_path = root + "/" + file
                 unzipped_file = gzip.open(full_file_path, 'rb')
                 actual_content += unzipped_file.read()
+<<<<<<< HEAD
     # returns a list with each JSON entry as the element - OPTIMIZE?
+=======
+>>>>>>> 9b174b87b0e27e66a4a89874470d35eb5afa2b80
     return actual_content.split('\n')
 
 def my_splitter(sentence, head, tail):
