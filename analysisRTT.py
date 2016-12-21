@@ -25,7 +25,7 @@ def unpack_files(filepath_to_walk):
                 full_file_path = root + "/" + file
                 unzipped_file = gzip.open(full_file_path, 'rb')
                 actual_content += unzipped_file.read()
-    # returns a list with each JSON entry as the element - OPTIMIZE?
+    # returns a list with each JSON entry as the element
     return actual_content.split('\n')
 
 def my_splitter(sentence, head, tail):
@@ -42,8 +42,15 @@ def my_splitter(sentence, head, tail):
     return sentence[end_of_head:start_of_tail]
 
 def timestamp_splitter(json_object):
-    # 2016-12-12T03:24:03Z
+    '''
+    Created a helper app that splits and returns a datetime object without using datetime.strptime. Strptime although
+    useful is very resource intensive.
+    :param json_object: json string.
+    :return: datetime.datetime object.
+    '''
+    # raw_timestamp looks something like this 2016-12-12T03:24:03Z
     raw_timestamp = my_splitter(json_object, '"timestamp":"', '"')
+    # datetime.datetime object
     parsed_timestamp = datetime.datetime(int(raw_timestamp[0:4]), int(raw_timestamp[5:7]), int(raw_timestamp[8:10]),
                                          int(raw_timestamp[11:13]), int(raw_timestamp[14:16]),
                                          int(raw_timestamp[17:19]))
@@ -63,10 +70,7 @@ def create_data_points(json_concatenated_object):
             # timestamp is a datetime object that is created from a string containing a timestamp from the JSON.
             # datetime object is very useful in the creation of the actual final data prior to plot as the object
             # allows easy time comparison, addition, and presentation in pyplot (for plotting)
-
             timestamp = timestamp_splitter(json_object)
-
-            # timestamp = datetime.datetime.strptime(my_splitter(json_object, '"timestamp":"', '"'), '%Y-%m-%dT%H:%M:%SZ') # old way of retrieving timestamp
             context = my_splitter(json_object, '"context":', ',"used_edns"')
             # there were context entries that did not have detailed information about the CDNs. So...
             # if there is detailed information in the context (aka: NOT '{"none":true}'), parse.
