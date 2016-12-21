@@ -41,6 +41,15 @@ def my_splitter(sentence, head, tail):
     start_of_tail = sentence.index(tail, end_of_head)
     return sentence[end_of_head:start_of_tail]
 
+def timestamp_splitter(json_object):
+    # 2016-12-12T03:24:03Z
+    raw_timestamp = my_splitter(json_object, '"timestamp":"', '"')
+    parsed_timestamp = datetime.datetime(int(raw_timestamp[0:4]), int(raw_timestamp[5:7]), int(raw_timestamp[8:10]),
+                                         int(raw_timestamp[11:13]), int(raw_timestamp[14:16]),
+                                         int(raw_timestamp[17:19]))
+    return parsed_timestamp
+
+
 def create_data_points(json_concatenated_object):
     '''
     extract fastly and akamai data points, sorted by timestamp.
@@ -53,8 +62,11 @@ def create_data_points(json_concatenated_object):
         if (json_object != ""):
             # timestamp is a datetime object that is created from a string containing a timestamp from the JSON.
             # datetime object is very useful in the creation of the actual final data prior to plot as the object
-            # allows easy time comparison, addition, and presentation in pyplot (for plotting) - OPTIMIZE?
-            timestamp = datetime.datetime.strptime(my_splitter(json_object, '"timestamp":"', '"'), '%Y-%m-%dT%H:%M:%SZ')
+            # allows easy time comparison, addition, and presentation in pyplot (for plotting)
+
+            timestamp = timestamp_splitter(json_object)
+
+            # timestamp = datetime.datetime.strptime(my_splitter(json_object, '"timestamp":"', '"'), '%Y-%m-%dT%H:%M:%SZ') # old way of retrieving timestamp
             context = my_splitter(json_object, '"context":', ',"used_edns"')
             # there were context entries that did not have detailed information about the CDNs. So...
             # if there is detailed information in the context (aka: NOT '{"none":true}'), parse.
