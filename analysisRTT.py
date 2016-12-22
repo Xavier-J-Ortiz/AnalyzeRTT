@@ -1,9 +1,9 @@
 '''
-Parse S3 logs downloaded on the local file system. Then do some math
-and analyze results.
-Currently a moving target by Xavier-J-Ortiz
-Debating whether to later load logs directly from S3 bucket, but first want to
-correctly load, parse, and analysis data found locally.
+AnalysisRTT contains all the methods that are used to do the heavy lifting for collecting, parsing, saving
+(via the cPickle library in Python), and returning a list of lists with relevant data for plotting differences between
+2 CDN providers RTT.
+tested and coded in Python 2.7
+by Xavier Ortiz
 '''
 import gzip, os
 import cPickle as pickle
@@ -59,9 +59,9 @@ def timestamp_splitter(json_object):
 
 def create_data_points(json_concatenated_object):
     '''
-    extract fastly and akamai data points, sorted by timestamp.
+    extract CDN_f and CDN_a data points, sorted by timestamp.
     :param json_concatenated_object: output of unpack_files()
-    :return: returns a timestamp sorted list of lists from the resulting json input logs, i.e: [[timestamp, akamai_rtt, fastly_rtt]]
+    :return: returns a timestamp sorted list of lists from the resulting json input logs, i.e: [[timestamp, a_rtt, f_rtt]]
     '''
     parsed_list = []
     for json_object in json_concatenated_object:
@@ -76,14 +76,14 @@ def create_data_points(json_concatenated_object):
             # if there is detailed information in the context (aka: NOT '{"none":true}'), parse.
             if (context != '{"none":true}'):
                 # opted to not use one-liners for readability.
-                # akamai_rtt
-                unparsed_akamai = my_splitter(context, '"akamai_ssl":', ',"fastly_ssl":')
-                akamai_rtt = int(my_splitter(unparsed_akamai, '"http_rtt":', '}'))
-                # fastly_rtt
-                unparsed_fastly = my_splitter(context, ',"fastly_ssl":', '}}') + '}'
-                fastly_rtt = int(my_splitter(unparsed_fastly, '"http_rtt":', '}'))
+                # a_rtt
+                unparsed_a = my_splitter(context, '"akamai_ssl":', ',"fastly_ssl":')
+                a_rtt = int(my_splitter(unparsed_a, '"http_rtt":', '}'))
+                # f_rtt
+                unparsed_f = my_splitter(context, ',"fastly_ssl":', '}}') + '}'
+                f_rtt = int(my_splitter(unparsed_f, '"http_rtt":', '}'))
                 # actual datapoint with RTT taken at that particular moment in time.
-                list = [timestamp, akamai_rtt, fastly_rtt]
+                list = [timestamp, a_rtt, f_rtt]
             # List of all the timestamped datapoints.
             parsed_list.append(list)
     # returned a sorted list of the datapoints from events that happened first, to the events that happened last

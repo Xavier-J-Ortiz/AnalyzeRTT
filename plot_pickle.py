@@ -13,7 +13,7 @@ def check_and_create_data(filepath, pickle_name):
     want to create one, and will return a datapoint list after creation.
     :param filepath: absolute path to traverse in order to gather data from .gz files downloaded from the S3 bucket
     :param pickle_name: name of the pickle file to create or load (string)
-    :return: returns list of the following data points: [timestamp, akamai_RTT, fastly_RTT]. Will create a Null value if
+    :return: returns list of the following data points: [timestamp, a_RTT, f_RTT]. Will create a Null value if
     an existing pickle file is not loaded (no output).
     '''
     # if no pickle file with specified name exists, create.
@@ -51,10 +51,10 @@ def check_and_create_data(filepath, pickle_name):
             raise ValueError("wrong prompted value.\nPlease re-run and input a valid answer when prompted " +
                              "with a 'y' or a 'n'.")
 
-def plot_akamai_vs_fastly(data_points, time_interval):
+def plot_a_vs_f(data_points, time_interval):
     '''
-    Takes the properly formatted datapoints list, and creates a visualization of akamaiRTT and fastlyRTT
-    :param data_points: properly formatted list of datapoints where each datapoint is [timestamp, akamaiRTT, fastlyRTT]
+    Takes the properly formatted datapoints list, and creates a visualization of aRTT and fRTT
+    :param data_points: properly formatted list of datapoints where each datapoint is [timestamp, aRTT, fRTT]
     :param time_interval: interval of time to aggregate the difference
     :return: Doesn't return anything, just displays the graph.
     '''
@@ -72,7 +72,7 @@ def plot_akamai_vs_fastly(data_points, time_interval):
     for datapoint in data_points:
         # if curr timestamp is larger than last timestamp in dataset
         if (datapoint[0] < next_timestamp):
-            # line below represents --> y = akamai_rtt - fastly_rtt
+            # line below represents --> y = a_rtt - f_rtt
             y_cumulative += (datapoint[1] - datapoint[2])
             counter += 1
 
@@ -97,7 +97,7 @@ def plot_akamai_vs_fastly(data_points, time_interval):
     # plot information
     plt.plot(x, y, 'rx')
     plt.xlabel('Time - datapoints every ' + str(time_interval) + ' minutes')
-    plt.ylabel("millisecond difference between akamai's RTT and fastly's RTT\npositive values mean fastly RTT is better\nnegative values mean akamai RTT is better")
-    plt.title("Comparison of fastly's RTT and akamai's RTT averaged over a " + str(time_interval) + " minute interval")
+    plt.ylabel("millisecond difference between a's RTT and f's RTT\npositive values mean f RTT is better\nnegative values mean a RTT is better")
+    plt.title("Comparison of f's RTT and a's RTT averaged over a " + str(time_interval) + " minute interval")
     plt.grid(linestyle = "--")
     plt.show()
