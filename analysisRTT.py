@@ -104,9 +104,11 @@ def time_to_gather_and_pickle_data(the_file_path, pickle_name):
     print "length of output: " + str(len(answer))
     print "first item output: " + str(answer[0][0]) + "\nlast item timestamp: " + str(answer[-1][0]) + "\n"
     # create pickle file for later consumption. That is, no need to harvest and parse large dataset.
+    out = open(pickle_name, 'wb')
     start_time = time.time()
-    pickle.dump(answer, open(pickle_name, 'wb'))
+    pickle.dump(answer, out)
     print "\ntime to execute creation of " + pickle_name + ": " + str(time.time() - start_time)
+    out.close()
     # good idea to create pickled data, and also return the answer.
     return answer
 
@@ -114,7 +116,7 @@ def open_and_consume_pickled_data(pickle_name):
     '''
     creates the original object that was pickled. in this case, just the list containing important JSON information.
     :param pickle_name: name of the pickle file.
-    :return: list with data points ready for analysis [timestamp, akamai_rtt, fastly_rtt]
+    :return: list with data points ready for analysis [timestamp, a_rtt, f_rtt]
     '''
     # pretty straight forward. Load a pickled file with some useful time performance data tagged.
     start_time_unpickle = time.time()

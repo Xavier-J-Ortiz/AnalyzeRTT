@@ -8,3 +8,5 @@ pickled_data.pckl
 pickled_data_4_hours.pckl
 pickled_data_2_hours.pckl
 *.pyc
+*.png
+

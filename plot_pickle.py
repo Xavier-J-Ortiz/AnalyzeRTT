@@ -97,7 +97,7 @@ def plot_a_vs_f(data_points, time_interval):
     # plot information
     plt.plot(x, y, 'rx')
     plt.xlabel('Time - datapoints every ' + str(time_interval) + ' minutes')
-    plt.ylabel("millisecond difference between a's RTT and f's RTT\npositive values mean f RTT is better\nnegative values mean a RTT is better")
+    plt.ylabel("millisecond difference between a's RTT and f's RTT\npositive values mean f's RTT is better\nnegative values mean a's RTT is better")
     plt.title("Comparison of f's RTT and a's RTT averaged over a " + str(time_interval) + " minute interval")
     plt.grid(linestyle = "--")
     plt.show()
